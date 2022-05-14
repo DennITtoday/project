@@ -1,0 +1,113 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+provider = "prisma-client-js"
+}
+
+datasource db {
+provider = "postgresql"
+url = env("DATABASE_URL")
+}
+
+model User {
+userId String @id @default(uuid())
+userName String @unique
+firstName String
+middleName String
+lastName String
+avatarUrl String
+role Role @default(user)
+guild Guild @relation(fields: [guildId], references: [guildId])
+guildId String
+healthPoints Int @default(100)
+experience Int @default(0)
+titles Title[]
+items Item[]
+location Location @relation(fields: [locationId], references: [locationId])
+locationId String
+events UsersEvents[]
+createdAt DateTime @default(now())
+updatedAt DateTime @updatedAt
+}
+
+enum Role {
+admin
+moderator
+user
+}
+
+model Guild {
+guildId String @id @default(uuid())
+guildName String
+guildDescription String?
+users User[]
+}
+
+model Item {
+itemId String @id @default(uuid())
+itemName String
+itemDescription String
+itemCost Int?
+isUnique Boolean @default(false)
+users User[]
+attributes Attribute[]
+events Event[]
+}
+
+model Attribute {
+attributeId String @id @default(uuid())
+attributeName String
+attributeDescription String
+attributeValue Int
+items Item[]
+}
+
+model Title {
+titleId String @id @default(uuid())
+tittleName String
+users User[]
+}
+
+model Location {
+locationId String @id @default(uuid())
+locationName String
+locationDescription String?
+users User[]
+events Event[]
+}
+
+model Event {
+eventId String @id @default(uuid())
+eventName String
+eventDescription String
+eventType EventType
+eventStart DateTime
+evemtEnd DateTime
+locations Location[]
+rewards Item[]
+users UsersEvents[]
+}
+
+enum EventType {
+test
+exam
+labaratoryWork
+courseWork
+diplomaWork
+practice
+olympiad
+conference
+}
+
+model UsersEvents {
+user User @relation(fields: [userId], references: [userId])
+userId String
+enteredAt DateTime @default(now())
+updatedAt DateTime @updatedAt
+exitedAt DateTime
+event Event @relation(fields: [eventId], references: [eventId])
+eventId String
+
+@@id([userId, eventId])
+}
